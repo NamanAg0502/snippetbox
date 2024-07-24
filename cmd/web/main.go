@@ -1,22 +1,39 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
+	"os"
 )
+
+type application struct {
+	errorLog *log.Logger
+	infoLog  *log.Logger
+}
 
 func main() {
 	// initialize servermux(express/router) to serve handlers
-	mux := http.NewServeMux()
+	addr := flag.String("addr", ":4000", "HTTP network address")
 
-	// defining routes and handlers
-	mux.HandleFunc("/", home)
-	mux.HandleFunc("/snippet/view", snippetView)
-	mux.HandleFunc("/snippet/create", snippetCreate)
+	flag.Parse()
+
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	app := &application{
+		errorLog: errorLog,
+		infoLog:  infoLog,
+	}
+
+	srv := &http.Server{
+		Addr:     *addr,
+		ErrorLog: errorLog,
+		Handler:  app.routes(),
+	}
 
 	// server initialization
-	err := http.ListenAndServe(":4000", mux)
-	if err != nil {
-		log.Fatal("Error listening to server: ", err)
-	}
+	infoLog.Printf("Starting server on %s", *addr)
+	err := srv.ListenAndServe()
+	errorLog.Fatal(err)
 }

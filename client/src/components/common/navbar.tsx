@@ -6,6 +6,11 @@ const links = [
     href: '/',
     label: 'Home',
   },
+  {
+    id: 2,
+    href: '/create',
+    label: 'New Snippet',
+  },
 ];
 
 const Navbar = () => {
@@ -14,7 +19,7 @@ const Navbar = () => {
       <ul className="flex h-full items-center justify-center gap-4">
         {links.map((link) => (
           <Link key={link.id} href={link.href}>
-            <li className="text-lg font-medium">{link.label}</li>
+            <li className="font-medium hover:underline">{link.label}</li>
           </Link>
         ))}
       </ul>
